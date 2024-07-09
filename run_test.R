@@ -1,7 +1,5 @@
 ## Set working directory here:
 setwd()
-setwd('~/Dropbox/Projects/R_fromhage_jennions_for_GitHub/')
-## setwd('~/Dropbox/R_fromhage_jennions')
 
 ## Resets environment
 rm(list=ls())
