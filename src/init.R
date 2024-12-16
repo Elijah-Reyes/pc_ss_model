@@ -40,28 +40,45 @@ make.pop <- function(prms) {
 
 
     fill.pop <- function(sex, traits, N.init, sex.num, prms=prms){
-        for(ll in 1:prms$num.traits){
-            sex[,(prms$L * (ll-1) + 1):(prms$L * ll)] <- rbinom(prms$L *
-                                                                  N.init, 1,
-                                                                  prob=traits[1,ll]) 
-        }    
-  
+        if(prms$n.patches==2){
+            sex.2 <- sex
+        }
+        if(prms$inits.fixed==TRUE){
+            for(ll in 1:prms$num.traits){
+                # sex[,(prms$L * (ll-1) + 1):((prms$L * ll)-(prms$L-traits[1,ll]))] <- 1 
+                sex[,(prms$L * (ll-1) + 1):(prms$L * ll)][,head(1:prms$L, traits[1,ll])] <- 1
+            }
+        }else{
+            for(ll in 1:prms$num.traits){
+                sex[,(prms$L * (ll-1) + 1):(prms$L * ll)] <- rbinom(prms$L *
+                                                                    N.init, 1,
+                                                                    prob=traits[1,ll]) 
+            }    
+        }
+       
         sex[,'state'] <- 1
         sex[,'sex'] <- sex.num
         sex[,'patch'] <- 1
         sex[,'ID'] <- 1:N.init
-
+       
         if(prms$n.patches==2){
-            sex.2 <- sex
             sex.2[,'patch'] <- 2
+            sex.2[,'state'] <- 1
+            sex.2[,'sex'] <- sex.num
             sex.2[,'ID'] <- (N.init + 1):(N.init*2)
 
-            for(ll in 1:prms$num.traits){
-                sex.2[,(prms$L * (ll-1) + 1):(prms$L * ll)] <- rbinom(prms$L *
-                                                                        N.init, 1,
-                                                                        prob=traits[2,ll]) 
+            if(prms$inits.fixed==TRUE){
+                for(ll in 1:prms$num.traits){
+                    sex.2[,(prms$L * (ll-1) + 1):(prms$L * ll)][,head(1:prms$L, traits[2,ll])] <- 1
+                    # sex.2[,(prms$L * (ll-1) + 1):((prms$L * ll)-(prms$L-traits[2,ll]))] <- 1
+                }
+            }else{
+                for(ll in 1:prms$num.traits){
+                    sex.2[,(prms$L * (ll-1) + 1):(prms$L * ll)] <- rbinom(prms$L *
+                                                                            N.init, 1,
+                                                                            prob=traits[2,ll]) 
+                }
             }
-
             sex <- rbind(sex, sex.2)
         }
 
@@ -76,7 +93,6 @@ make.pop <- function(prms) {
 
         return(sex)
     }
-
     
     traits <- rbind(c(prms$male.sex.inits[1], prms$male.care.inits[1], prms$female.sex.inits[1], prms$female.care.inits[1], 0), 
                     c(prms$male.sex.inits[2], prms$male.care.inits[2], prms$female.sex.inits[2], prms$female.care.inits[2], 1))
